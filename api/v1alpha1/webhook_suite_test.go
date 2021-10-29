@@ -167,6 +167,9 @@ var _ = BeforeSuite(func() {
 >>>>>>> 3770d00 (add webhook)
 	Expect(err).NotTo(HaveOccurred())
 
+	err = (&RabbitMQSecretEngineRole{}).SetupWebhookWithManager(mgr)
+	Expect(err).NotTo(HaveOccurred())
+
 	//+kubebuilder:scaffold:webhook
 
 	go func() {
