@@ -9,7 +9,7 @@ local_resource(
 
 
 custom_build(
-  'quay.io/raffaelespazzoli/vault-config-operator',
+  'rakivnenko/test/vault-config-operator',
   'buildah bud -t $EXPECTED_REF --ignorefile ci.dockerignore -f ./ci.Dockerfile .  && buildah push $EXPECTED_REF $EXPECTED_REF',
   entrypoint=['/manager'],
   deps=['./bin'],
