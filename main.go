@@ -162,6 +162,14 @@ func main() {
 		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQSecretEngineConfig")
 		os.Exit(1)
 	}
+	if err = (&controllers.RabbitMQSecretEngineRoleReconciler{
+		ReconcilerBase: util.NewReconcilerBase(mgr.GetClient(), mgr.GetScheme(), mgr.GetConfig(), mgr.GetEventRecorderFor("RabbitMQSecretEngineRole"), mgr.GetAPIReader()),
+		Log:            ctrl.Log.WithName("controllers").WithName("RabbitMQSecretEngineRole"),
+		ControllerName: "RabbitMQSecretEngineRole",
+	}).SetupWithManager(mgr); err != nil {
+		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQSecretEngineRole")
+		os.Exit(1)
+	}
 
 	if err = (&controllers.GitHubSecretEngineConfigReconciler{
 		ReconcilerBase: util.NewReconcilerBase(mgr.GetClient(), mgr.GetScheme(), mgr.GetConfig(), mgr.GetEventRecorderFor("GitHubSecretEngineConfig"), mgr.GetAPIReader()),
@@ -227,22 +235,16 @@ func main() {
 			setupLog.Error(err, "unable to create webhook", "webhook", "GitHubSecretEngineRole")
 			os.Exit(1)
 		}
-	}
 
-	if err = (&redhatcopv1alpha1.RabbitMQSecretEngineConfig{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "RabbitMQSecretEngineConfig")
-		os.Exit(1)
-	}
-	if err = (&controllers.RabbitMQSecretEngineRoleReconciler{
-		Client: mgr.GetClient(),
-		Scheme: mgr.GetScheme(),
-	}).SetupWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create controller", "controller", "RabbitMQSecretEngineRole")
-		os.Exit(1)
-	}
-	if err = (&redhatcopv1alpha1.RabbitMQSecretEngineRole{}).SetupWebhookWithManager(mgr); err != nil {
-		setupLog.Error(err, "unable to create webhook", "webhook", "RabbitMQSecretEngineRole")
-		os.Exit(1)
+		if err = (&redhatcopv1alpha1.RabbitMQSecretEngineConfig{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "RabbitMQSecretEngineConfig")
+			os.Exit(1)
+		}
+
+		if err = (&redhatcopv1alpha1.RabbitMQSecretEngineRole{}).SetupWebhookWithManager(mgr); err != nil {
+			setupLog.Error(err, "unable to create webhook", "webhook", "RabbitMQSecretEngineRole")
+			os.Exit(1)
+		}
 	}
 	//+kubebuilder:scaffold:builder
 

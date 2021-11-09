@@ -293,12 +293,6 @@ rules:
 - apiGroups:
   - redhatcop.redhat.io
   resources:
-  - rabbitmqsecretengineconfigs/finalizers
-  verbs:
-  - update
-- apiGroups:
-  - redhatcop.redhat.io
-  resources:
   - rabbitmqsecretengineconfigs/status
   verbs:
   - get

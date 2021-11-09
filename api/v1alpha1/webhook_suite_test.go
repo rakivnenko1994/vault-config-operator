@@ -157,14 +157,13 @@ var _ = BeforeSuite(func() {
 	err = (&Policy{}).SetupWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
-<<<<<<< HEAD
 	err = (&GitHubSecretEngineConfig{}).SetupWebhookWithManager(mgr)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&GitHubSecretEngineRole{}).SetupWebhookWithManager(mgr)
-=======
+	Expect(err).NotTo(HaveOccurred())
+
 	err = (&RabbitMQSecretEngineConfig{}).SetupWebhookWithManager(mgr)
->>>>>>> 3770d00 (add webhook)
 	Expect(err).NotTo(HaveOccurred())
 
 	err = (&RabbitMQSecretEngineRole{}).SetupWebhookWithManager(mgr)
