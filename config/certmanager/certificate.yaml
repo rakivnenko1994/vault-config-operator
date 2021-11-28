@@ -14,21 +14,21 @@
        tokenSecretRef:
          name: my-vault-token
          key: token
----
-apiVersion: cert-manager.io/v1
-kind: Certificate
-metadata:
-  name: cert  # this name should match the one appeared in kustomizeconfig.yaml
-  namespace: system
-spec:
-  # $(SERVICE_NAME) and $(SERVICE_NAMESPACE) will be substituted by kustomize
-  dnsNames:
-  - $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc
-  - $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc.cluster.local
-  issuerRef:
-    kind: Issuer
-    name: my-vault-issuer
-  secretName: webhook-server-cert # this secret will not be prefixed, since it's not managed by kustomize
+# ---
+# apiVersion: cert-manager.io/v1
+# kind: Certificate
+# metadata:
+#   name: cert  # this name should match the one appeared in kustomizeconfig.yaml
+#   namespace: system
+# spec:
+#   # $(SERVICE_NAME) and $(SERVICE_NAMESPACE) will be substituted by kustomize
+#   dnsNames:
+#   - $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc
+#   - $(SERVICE_NAME).$(SERVICE_NAMESPACE).svc.cluster.local
+#   issuerRef:
+#     kind: Issuer
+#     name: my-vault-issuer
+#   secretName: webhook-server-cert # this secret will not be prefixed, since it's not managed by kustomize
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

@@ -6,11 +6,10 @@ spec:
   authentication: 
     path: kubernetes
     role: rabbitmq-engine-admin
-  connectionURI: https://test.com
+  connectionURI: http://10.108.150.82:15672
   rootCredentials:
     secret:
       name: rabbitmq-admin-password
     passwordKey: rabbitmq-password
   path: test-vault-config-operator/rabbitmq
-  username: rabbitmq
-  verifyConnection: false
+  username: guest

@@ -56,6 +56,7 @@ type RabbitMQSecretEngineConfigSpec struct {
 type RMQSEConfig struct {
 	// ConnectionURL Specifies the connection string used to connect to the RabbitMQ cluster.
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^(http|https):\/\/.+$`
 	ConnectionURI string `json:"connectionURI,omitempty"`
 
 	// Username Specifies the name of the user to use as the "administrator" user when connecting to the RabbitMQ cluster. This "administrator" user is used to create/update/delete users, so you will need to ensure that this user has permissions to manipulate users. If management plugin is used, this user need to have "administrator" tag, no additional permissions necessary.
@@ -65,6 +66,7 @@ type RMQSEConfig struct {
 
 	// VerifyConnection Specifies if the connection is verified during initial configuration. Defaults to true.
 	// +kubebuilder:validation:Optional
+	// +kubebuilder:pruning:PreserveUnknownFields
 	VerifyConnection bool `json:"verifyConnection,omitempty"`
 
 	// PasswordPolicy The name of the password policy to use when generating passwords for this engine. Defaults to generating an alphanumeric password if not set.
@@ -124,7 +126,7 @@ func init() {
 func (fields *RMQSEConfig) rabbitMQToMap() map[string]interface{} {
 	payload := map[string]interface{}{}
 	payload["connection_uri"] = fields.ConnectionURI
-	payload["verify_connection"] = &fields.VerifyConnection
+	payload["verify_connection"] = fields.VerifyConnection
 	payload["username"] = fields.retrievedUsername
 	payload["password"] = fields.retrievedPassword
 
@@ -236,54 +238,54 @@ func (rabbitMQ *RabbitMQSecretEngineConfig) setInternalCredentials(context conte
 	return errors.New("no means of retrieving a secret was specified")
 }
 
-var _ VaultEngineObject = &RabbitMQSecretEngineConfig{}
+// var _ VaultEngineObject = &RabbitMQSecretEngineConfig{}
 
-func (fields *RMQSEConfig) leasesToMap() map[string]int {
-	payload := map[string]int{}
-	payload["ttl"] = fields.LeaseTTL
-	payload["max_ttl"] = fields.LeaseMaxTTL
-	return payload
-}
+// func (fields *RMQSEConfig) leasesToMap() map[string]int {
+// 	payload := map[string]int{}
+// 	payload["ttl"] = fields.LeaseTTL
+// 	payload["max_ttl"] = fields.LeaseMaxTTL
+// 	return payload
+// }
 
-func (d *RabbitMQSecretEngineConfig) GetEngineListPath() string {
-	return ""
-}
+// func (d *RabbitMQSecretEngineConfig) GetEngineListPath() string {
+// 	return ""
+// }
 
-func (rabbitMQ *RabbitMQSecretEngineConfig) GetTunePayload() map[string]interface{} {
-	return rabbitMQ.Spec.rabbitMQToMap()
-}
+// func (rabbitMQ *RabbitMQSecretEngineConfig) GetTunePayload() map[string]interface{} {
+// 	return rabbitMQ.Spec.rabbitMQToMap()
+// }
 
-func (rabbitMQ *RabbitMQSecretEngineConfig) GetEngineTunePath() string {
-	return string(rabbitMQ.Spec.Path) + "/config/lease"
-}
+// func (rabbitMQ *RabbitMQSecretEngineConfig) GetEngineTunePath() string {
+// 	return string(rabbitMQ.Spec.Path) + "/config/lease"
+// }
 
-type VaultEngineObject interface {
-	GetEngineListPath() string
-	GetEngineTunePath() string
-	GetTunePayload() map[string]interface{}
-}
+// type VaultEngineObject interface {
+// 	GetEngineListPath() string
+// 	GetEngineTunePath() string
+// 	GetTunePayload() map[string]interface{}
+// }
 
-func NewVaultEngineEndpoint(obj client.Object) *vaultutils.VaultEngineEndpoint {
-	return &vaultutils.VaultEngineEndpoint{
-		vaultEngineObject: obj.(VaultEngineObject),
-		VaultEndpoint:     vaultutils.NewVaultEndpoint(obj),
-	}
-}
+// func NewVaultEngineEndpoint(obj client.Object) *vaultutils.VaultEngineEndpoint {
+// 	return &vaultutils.VaultEngineEndpoint{
+// 		vaultEngineObject: obj.(VaultEngineObject),
+// 		VaultEndpoint:     vaultutils.NewVaultEndpoint(obj),
+// 	}
+// }
 
-func (ve *VaultEngineEndpoint) CreateOrUpdateTuneConfig(context context.Context) error {
-	log := log.FromContext(context)
-	currentTunePayload, err := ve.readTuneConfig(context)
-	if err != nil {
-		log.Error(err, "unable to read object at", "path", ve.vaultEngineObject.GetEngineTunePath())
-		return err
-	}
+// func (ve *VaultEngineEndpoint) CreateOrUpdateTuneConfig(context context.Context) error {
+// 	log := log.FromContext(context)
+// 	currentTunePayload, err := ve.readTuneConfig(context)
+// 	if err != nil {
+// 		log.Error(err, "unable to read object at", "path", ve.vaultEngineObject.GetEngineTunePath())
+// 		return err
+// 	}
 
-	if !ve.vaultObject.IsEquivalentToDesiredState(currentTunePayload) {
-		return write(context, ve.vaultEngineObject.GetEngineTunePath(), ve.vaultEngineObject.GetTunePayload())
-	}
+// 	if !ve.vaultObject.IsEquivalentToDesiredState(currentTunePayload) {
+// 		return write(context, ve.vaultEngineObject.GetEngineTunePath(), ve.vaultEngineObject.GetTunePayload())
+// 	}
 
-	return nil
-}
+// 	return nil
+// }
 
 // func (rabbitMQ *RabbitMQSecretEngineConfig) CheckTTLvalues() bool {
 // 	if rabbitMQ.Spec.LeaseTTL != 0 || rabbitMQ.Spec.LeaseMaxTTL != 0 {
