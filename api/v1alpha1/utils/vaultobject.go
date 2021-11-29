@@ -80,3 +80,36 @@ func (ve *VaultEndpoint) CreateOrUpdate(context context.Context) error {
 	}
 	return nil
 }
+
+type VaultObjectWithLease interface {
+	VaultObject
+	GetLeasePath() string
+	GetLeasePayload() map[string]interface{}
+}
+
+type VaultEndpointWithLease struct {
+	vaultObjectWithLease VaultObjectWithLease
+}
+
+func (ve *VaultEndpointWithLease) CreateOrUpdateLease(context context.Context) error {
+	log := log.FromContext(context)
+	currentPayload, found, err := read(context, ve.vaultObjectWithLease.GetLeasePath())
+	if err != nil {
+		log.Error(err, "unable to read object at", "path", ve.vaultObjectWithLease.GetLeasePath())
+		return err
+	}
+	if !found {
+		return write(context, ve.vaultObjectWithLease.GetLeasePath(), ve.vaultObjectWithLease.GetLeasePayload())
+	} else {
+		if !ve.vaultObjectWithLease.IsEquivalentToDesiredState(currentPayload) {
+			return write(context, ve.vaultObjectWithLease.GetLeasePath(), ve.vaultObjectWithLease.GetLeasePayload())
+		}
+	}
+	return nil
+}
+
+func NewVaultEndpointWithLease(obj client.Object) *VaultEndpointWithLease {
+	return &VaultEndpointWithLease{
+		vaultObjectWithLease: obj.(VaultObjectWithLease),
+	}
+}
